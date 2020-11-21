@@ -62,10 +62,16 @@ this.geoJson().then(data => {
         .attr("style", "cursor:pointer")
         .attr("d", path)
         .on('mouseover', function (d) {
-            d3.select(this).attr("stroke-width", 5 / self.scale + "px");
-            d3.select(this).attr("stroke", color.pointColor);
+            let info = d.target.__data__.properties
+            let fill = "#7AC5CD"
+            if (info.id.length > 2) {
+                fill = "#C1FFC1"
+            }
+            // d3.select(this).attr("stroke-width", 5 / self.scale + "px");
+            // d3.select(this).attr("stroke", color.pointColor);
+            d3.select(this).attr("fill", fill)
         })
-        .on('mousemove', function (d, i) {
+        .on('mousemove', function (d) {
             let info = d.target.__data__.properties
             // console.log(d)
             let x = d.pageX;
@@ -82,10 +88,16 @@ this.geoJson().then(data => {
                 .attr("fill", "#D36611")
                 .text("当前位置" + ":" + info.name)
         })
-        .on('mouseout', function () {
+        .on('mouseout', function (d) {
+            let info = d.target.__data__.properties
+            let fill = "#000"
+            if (info.id.length > 2) {
+                fill = "#1b5c5b"
+            }
             d3.select(this)
-                .attr("stroke", color.lineColor)
-                .attr("stroke-width", 1 / scale + "px");
+                // .attr("stroke", color.lineColor)
+                // .attr("stroke-width", 1 / scale + "px");
+                .attr("fill", fill)
             d3.select("#tooltip").remove();
         })
         .on("click", function (d) {
@@ -123,9 +135,10 @@ this.geoJson().then(data => {
                         .append("tspan")
                         .attr("x", text.attr("x"))
                         .attr("dy", "1em")
+                        .attr("opacity", 0.8)
                         .text(function (d) {
                             return d;
-                        });
+                        })
                 })
             }
         })
