@@ -67,13 +67,10 @@ this.geoJson().then(data => {
             if (info.id.length > 2) {
                 fill = "#C1FFC1"
             }
-            // d3.select(this).attr("stroke-width", 5 / self.scale + "px");
-            // d3.select(this).attr("stroke", color.pointColor);
             d3.select(this).attr("fill", fill)
         })
         .on('mousemove', function (d) {
             let info = d.target.__data__.properties
-            // console.log(d)
             let x = d.pageX;
             let y = d.pageY;
             d3.select("#tooltip").remove();
@@ -95,8 +92,6 @@ this.geoJson().then(data => {
                 fill = "#1b5c5b"
             }
             d3.select(this)
-                // .attr("stroke", color.lineColor)
-                // .attr("stroke-width", 1 / scale + "px");
                 .attr("fill", fill)
             d3.select("#tooltip").remove();
         })
@@ -110,6 +105,7 @@ this.geoJson().then(data => {
                     let x = d.pageX;
                     let y = d.pageY;
                     d3.select("#tooltip").remove();
+                    //todo 预报天气
                     let s = "实时天气" + "，"
                         + " ，"
                         + "当前城市：" + weatherData.live[0].city + "，"
@@ -205,29 +201,21 @@ function mapChange(flag, d) {
                                 //隐藏其他省份
                                 .attr("style", "display:none")
                                 .attr("stroke-width", "0.3px");
-                            // d3.select("#text" + n.properties.id)
-                            //     .attr("style", "display:none")
-                            //     .attr("font-size", "3px");
                         } else {
                             //如果是其他地级市
                             d3.select("#path" + n.properties.id)
                                 .attr("style", "display:none")
                                 .attr("stroke-width", "0.2px");
-                            // d3.select("#text" + n.properties.id)
-                            //     .attr("style", "display:none")
-                            //     .attr("font-size", "1px");
                         }
                     }
                 })
             })
         }
     } else {
+        //close
         d3.selectAll(".location").attr("style", "display:none");
-        // d3.selectAll("text").attr("font-size", "14px");
         d3.selectAll("path").attr("stroke-width", "1px");
-        // d3.selectAll(".distribution").attr("style", "display:block");
         d3.selectAll(".distribution").attr("style", "cursor:pointer");
-
     }
 }
 
@@ -254,8 +242,6 @@ async function getWeather(location, flag) {
         body: formData
     };
     const weather = await fetch('http://111.0.80.7:7654/weather-server-go/rest/weather/getWeather', options).then(res => res.json())
-    // .then(weatherData => console.log(weatherData))
-    // .catch(err => console.log('err:', err))
     console.log(weather.data)
     return weather.data
 }
