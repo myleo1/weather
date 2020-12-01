@@ -1,5 +1,5 @@
-const height = 600;
-const width = 1000;
+const height = 800;
+const width = 1200;
 const color = {
     lineColor: "#4AFFFE",
     pointColor: "#fbcd2c",
@@ -9,6 +9,8 @@ const color = {
     pointTextColor: "#fff",
     haveSelectColor: "#1c2b2b"
 }
+//默认flag为2,获取实时天气
+let getWeatherFlag = 2
 let scale = 1;
 let texts, centered;
 
@@ -23,6 +25,75 @@ svg.append("rect")
     .attr("width", width)
     .attr("height", height)
     .on("click", clicked);
+
+svg.append("text")
+    .attr("x", 450)
+    .attr("y", 80)
+    .attr("fill", "#00A876")
+    .attr("font-weight", "bold")
+    .attr("style", "letter-spacing:10px")
+    .attr("font-size", 40)
+    .text("全国天气数据可视化")
+
+svg.append("rect")
+    .attr("id", "live")
+    .attr("class", "button")
+    /*  x : 矩形左上角的x坐标。
+        y : 矩形左上角的y坐标。
+        width : 矩形的宽度。
+        height : 矩形的高度。
+        rx : 对于圆角矩形，指定椭圆在x方向的半径。
+        ry : 对于圆角矩形，指定椭圆在y方向的半径。
+        fill : 填充色 改变文字<text>的颜色也用这个。
+        storke ： 轮廓线的颜色。
+        stroke-width : 轮廓线的宽度。
+        opacity ： 透明度
+    */
+    .attr("transform", "translate(+1050,+200)")
+
+svg.append("rect")
+    .attr("id", "forecast")
+    .attr("class", "button")
+    .attr("transform", "translate(+1050,+270)")
+
+svg.selectAll(".button")
+    .attr("rx", 10)
+    .attr("ry", 10)
+    .attr("width", 70)
+    .attr("height", 40)
+    .attr("fill", "#0b6c79")
+    .attr("style","cursor:pointer")
+    .on("mouseover",function (){
+        d3.select(this).attr("fill","#fbcd2c")
+    })
+    .on("mouseout",function (){
+        d3.select(this).attr("fill","#0b6c79")
+    })
+
+svg.append("text")
+    .attr("x", 1055)
+    .attr("y", 225)
+    .attr("fill", "white")
+    .attr("font-weight", "bold")
+    .attr("style", "letter-spacing:3px")
+    .attr("font-size", 15)
+    .attr("style","cursor:pointer")
+    .text("实时天气")
+
+svg.append("text")
+    .attr("x", 1055)
+    .attr("y", 295)
+    .attr("fill", "white")
+    .attr("font-weight", "bold")
+    .attr("style", "letter-spacing:3px")
+    .attr("font-size", 15)
+    .attr("style","cursor:pointer")
+    .text("预报天气")
+
+svg.selectAll(".button")
+    .on("click", function (d) {
+        buttonClicked(d)
+    })
 
 let mapG = svg.append("g")
     .attr("id", "mapG")
@@ -101,44 +172,79 @@ this.geoJson().then(data => {
             }
             if (d.target.__data__.properties.id.length > 2) {
                 let info = d.target.__data__.properties
-                getWeather(info.id, 2).then(weatherData => {
+                getWeather(info.id, getWeatherFlag).then(weatherData => {
                     let x = d.pageX;
                     let y = d.pageY;
                     d3.select("#tooltip").remove();
-                    //todo 预报天气
-                    let s = "实时天气" + "，"
-                        + " ，"
-                        + "当前城市：" + weatherData.live[0].city + "，"
-                        + "天气：" + weatherData.live[0].weather + "，"
-                        + "温度：" + weatherData.live[0].temperature + "℃" + "，"
-                        + "湿度：" + weatherData.live[0].humidity + "，"
-                        + "风向：" + weatherData.live[0].winddirection + "，"
-                        + "风力：" + weatherData.live[0].windpower + "级" + "，"
-                        + "更新时间：" + weatherData.live[0].reporttime + "，"
-                    let text = d3.select("svg").append("text")
-                        .attr("id", "tooltip")
-                        .attr("x", x + 18)
-                        .attr("y", y + 18)
-                        .attr("text-anchor", "middle")
-                        .attr("font-family", "sans-setif")
-                        .attr("font-size", "15px")
-                        .attr("font-weight", "bold")
-                        .attr("fill", "#FF8C00")
-                    let str = s.split("，");
-                    text.selectAll("tspan")
-                        .data(str)
-                        .enter()
-                        .append("tspan")
-                        .attr("x", text.attr("x"))
-                        .attr("dy", "1em")
-                        .attr("opacity", 0.8)
-                        .text(function (d) {
-                            return d;
-                        })
+                    //预报天气
+                    if (getWeatherFlag === 1) {
+                        let s = "预报天气" + "，"
+
+                        for (let i = 0; i < 3; i++) {
+                            s = s
+                                + " ，"
+                                + "日期：" + weatherData.forecast[i].date + "，"
+                                + "当前城市：" + weatherData.live[0].city + "，"
+                                + "白天天气：" + weatherData.forecast[i].dayweather + "，"
+                                + "夜晚天气：" + weatherData.forecast[i].nightweather + "，"
+                                + "温度：" + weatherData.forecast[i].nighttemp + "℃" + "~" + weatherData.forecast[0].daytemp + "℃" + "，"
+                                + "风向：" + weatherData.forecast[i].daywind + "，"
+                                + "风力：" + weatherData.forecast[i].daypower + "级" + "，"
+                        }
+                        let text = d3.select("svg").append("text")
+                            .attr("id", "tooltip")
+                            .attr("x", x + 18)
+                            .attr("y", y + 18)
+                            .attr("text-anchor", "middle")
+                            .attr("font-family", "sans-setif")
+                            .attr("font-size", "15px")
+                            .attr("font-weight", "bold")
+                            .attr("fill", "#FF8C00")
+                        let str = s.split("，");
+                        text.selectAll("tspan")
+                            .data(str)
+                            .enter()
+                            .append("tspan")
+                            .attr("x", text.attr("x"))
+                            .attr("dy", "1em")
+                            .attr("opacity", 0.8)
+                            .text(function (d) {
+                                return d;
+                            })
+                    } else {
+                        let s = "实时天气" + "，"
+                            + " ，"
+                            + "当前城市：" + weatherData.live[0].city + "，"
+                            + "天气：" + weatherData.live[0].weather + "，"
+                            + "温度：" + weatherData.live[0].temperature + "℃" + "，"
+                            + "湿度：" + weatherData.live[0].humidity + "，"
+                            + "风向：" + weatherData.live[0].winddirection + "，"
+                            + "风力：" + weatherData.live[0].windpower + "级" + "，"
+                            + "更新时间：" + weatherData.live[0].reporttime + "，"
+                        let text = d3.select("svg").append("text")
+                            .attr("id", "tooltip")
+                            .attr("x", x + 18)
+                            .attr("y", y + 18)
+                            .attr("text-anchor", "middle")
+                            .attr("font-family", "sans-setif")
+                            .attr("font-size", "15px")
+                            .attr("font-weight", "bold")
+                            .attr("fill", "#FF8C00")
+                        let str = s.split("，");
+                        text.selectAll("tspan")
+                            .data(str)
+                            .enter()
+                            .append("tspan")
+                            .attr("x", text.attr("x"))
+                            .attr("dy", "1em")
+                            .attr("opacity", 0.8)
+                            .text(function (d) {
+                                return d;
+                            })
+                    }
                 })
             }
         })
-
 });
 
 function clicked(d, flag) {
@@ -219,6 +325,14 @@ function mapChange(flag, d) {
     }
 }
 
+function buttonClicked(d) {
+    if (d.toElement.id === "live") {
+        getWeatherFlag = 2
+    } else {
+        getWeatherFlag = 1
+    }
+}
+
 
 //天气api部分
 // getWeather(3301, 1)
@@ -245,3 +359,5 @@ async function getWeather(location, flag) {
     console.log(weather.data)
     return weather.data
 }
+
+
