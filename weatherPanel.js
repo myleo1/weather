@@ -1,5 +1,7 @@
 const height = 800;
 const width = 1500;
+let weatherFlag
+let weatherFlag4Forecast = []
 let icon = {}
 icon.temperature = `<g><g><path d="M53.673,62.001V29.97c0-2.028-1.644-3.672-3.673-3.672c-2.03,0-3.674,1.645-3.674,3.672v32.031     c-5.353,1.585-9.26,6.535-9.26,12.402c0,7.143,5.792,12.934,12.934,12.934c7.145,0,12.935-5.791,12.935-12.934     C62.935,68.536,59.025,63.586,53.673,62.001z"/></g><g><path d="M60.322,57.34V15.975c0-5.691-4.631-10.322-10.322-10.322s-10.322,4.631-10.322,10.322V57.34     c-5.965,3.607-9.62,10.032-9.62,17.063c0,10.996,8.946,19.944,19.942,19.944s19.942-8.948,19.942-19.944     C69.942,67.372,66.286,60.947,60.322,57.34z M50,90.146c-8.681,0-15.745-7.062-15.745-15.743c0-5.895,3.253-11.249,8.492-13.974     l1.13-0.588V15.975c0-3.377,2.746-6.123,6.123-6.123s6.123,2.746,6.123,6.123v0.785h-2.01c-0.58,0-1.05,0.471-1.05,1.05     c0,0.581,0.47,1.05,1.05,1.05h2.01v1.181h-2.01c-0.58,0-1.05,0.469-1.05,1.05c0,0.58,0.47,1.05,1.05,1.05h2.01v1.18h-2.01     c-0.58,0-1.05,0.471-1.05,1.05c0,0.581,0.47,1.05,1.05,1.05h2.01v34.422l1.129,0.588c5.238,2.725,8.491,8.079,8.491,13.974     C65.743,83.084,58.68,90.146,50,90.146z"/></g></g>`;
 icon.humidity = `<g ><path d="M50,5c0,0-35,22.3-35,55c0,19.3,15.7,35,35,35s35-15.7,35-35C85,27.3,50,5,50,5z M50,87.5c-15.2,0-27.5-12.3-27.5-27.5   c0-21.9,19-39.1,27.5-45.8C58.5,20.8,77.5,38,77.5,60C77.5,75.2,65.2,87.5,50,87.5z"/><path d="M32.5,60h-5c0,12.4,10.1,22.5,22.5,22.5v-5C40.4,77.5,32.5,69.6,32.5,60z"/></g>`;
@@ -79,215 +81,362 @@ icon["hail"] = ``;
 icon["thunderstorm"] = ``;
 icon["tornado"] = ``;
 
-let svg = d3.select("body").append("svg")
-    .attr("id", "panelSvg")
-    .attr("width", width)
-    .attr("height", height)
+getWeather(location.search.substr(location.search.length - 4)).then(weatherJson => {
+    switch (weatherJson.live.weather) {
+        case"多云":
+        case"阴":
+            weatherFlag = "cloudy"
+            break
+        case"晴":
+        case"晴间多云":
+            weatherFlag = "clear-day"
+            break
+        case"阵雨":
+        case"雷阵雨":
+        case"雷阵雨并伴有冰雹":
+        case"小雨":
+        case"中雨":
+        case"大雨":
+        case"暴雨":
+        case"大暴雨":
+        case"特大暴雨":
+        case"强阵雨":
+        case"强雷阵雨":
+        case"极端降雨":
+        case"毛毛雨/细雨":
+        case"雨":
+        case"小雨-中雨":
+        case"中雨-大雨":
+        case"大雨-暴雨":
+        case"暴雨-大暴雨":
+        case"大暴雨-特大暴雨":
+        case"冻雨":
+        case"雨夹雪":
+        case"雨雪天气":
+        case"阵雨夹雪":
+            weatherFlag = "rain"
+            break
+        case"雪":
+        case"阵雪":
+        case"小雪":
+        case"中雪":
+        case"大雪":
+        case"暴雪":
+        case"小雪-中雪":
+        case"中雪-大雪":
+        case"大雪-暴雪":
+            weatherFlag = "snow"
+            break
+        case"雾":
+        case"浓雾":
+        case"强浓雾":
+        case"轻雾":
+        case"大雾":
+        case"特强浓雾":
+        case"霾":
+        case"中度霾":
+        case"重度霾":
+        case"严重霾":
+            weatherFlag = "fog"
+            break
+        default:
+            weatherFlag = "clear-day"
+            break
+    }
+    weatherJson.forecast.forEach((item, index) => {
+        switch (item.dayweather) {
+            case"多云":
+            case"阴":
+                weatherFlag4Forecast[index] = "cloudy"
+                break
+            case"晴":
+            case"晴间多云":
+                weatherFlag4Forecast[index] = "clear-day"
+                break
+            case"阵雨":
+            case"雷阵雨":
+            case"雷阵雨并伴有冰雹":
+            case"小雨":
+            case"中雨":
+            case"大雨":
+            case"暴雨":
+            case"大暴雨":
+            case"特大暴雨":
+            case"强阵雨":
+            case"强雷阵雨":
+            case"极端降雨":
+            case"毛毛雨/细雨":
+            case"雨":
+            case"小雨-中雨":
+            case"中雨-大雨":
+            case"大雨-暴雨":
+            case"暴雨-大暴雨":
+            case"大暴雨-特大暴雨":
+            case"冻雨":
+            case"雨夹雪":
+            case"雨雪天气":
+            case"阵雨夹雪":
+                weatherFlag4Forecast[index] = "rain"
+                break
+            case"雪":
+            case"阵雪":
+            case"小雪":
+            case"中雪":
+            case"大雪":
+            case"暴雪":
+            case"小雪-中雪":
+            case"中雪-大雪":
+            case"大雪-暴雪":
+                weatherFlag4Forecast[index] = "snow"
+                break
+            case"雾":
+            case"浓雾":
+            case"强浓雾":
+            case"轻雾":
+            case"大雾":
+            case"特强浓雾":
+            case"霾":
+            case"中度霾":
+            case"重度霾":
+            case"严重霾":
+                weatherFlag4Forecast[index] = "fog"
+                break
+            default:
+                weatherFlag4Forecast[index] = "clear-day"
+                break
+        }
+    })
+    let svg = d3.select("body").append("svg")
+        .attr("id", "panelSvg")
+        .attr("width", width)
+        .attr("height", height)
 
-svg.append("rect")
-    .attr("class", "background")
-    .attr("fill", "#152025")
-    .attr("width", "100%")
-    .attr("height", "100%")
+    svg.append("rect")
+        .attr("class", "background")
+        .attr("fill", "#152025")
+        .attr("width", "100%")
+        .attr("height", "100%")
 
 //title
-svg.append("text")
-    .attr("x", 650)
-    .attr("y", 100)
-    .attr("text-anchor", "middle")
-    .attr("font-size", 30)
-    .attr("font-weight", "bold")
-    .attr("fill", "#fff")
-    .text("杭州市")
+    svg.append("text")
+        .attr("x", 650)
+        .attr("y", 100)
+        .attr("text-anchor", "middle")
+        .attr("font-size", 30)
+        .attr("font-weight", "bold")
+        .attr("fill", "#fff")
+        .text(weatherJson.live.city)
 
 //current time
-let date = new Date()
+    let date = new Date()
 //month返回0~11之间的数
-let month = date.getMonth() + 1
-let day = date.getDate()
-let weekDay = date.getDay()
-let hour = date.getHours()
-if (hour < 10) {
-    hour = "0" + hour
-}
-let min = date.getMinutes()
-if (min < 10) {
-    min = "0" + min
-}
+    let month = date.getMonth() + 1
+    let day = date.getDate()
+    let weekDay = date.getDay()
+    let hour = date.getHours()
+    if (hour < 10) {
+        hour = "0" + hour
+    }
+    let min = date.getMinutes()
+    if (min < 10) {
+        min = "0" + min
+    }
 
-svg.append("text")
-    .attr("x", 1200)
-    .attr("y", 120)
-    .attr("text-anchor", "end")
-    .attr("fill", "#fff")
-    .attr("font-size", 60)
-    .text(hour + ":" + min)
+    svg.append("text")
+        .attr("x", 1200)
+        .attr("y", 120)
+        .attr("text-anchor", "end")
+        .attr("fill", "#fff")
+        .attr("font-size", 60)
+        .text(hour + ":" + min)
 
-let dNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let dNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-svg.append("text")
-    .attr("x", 1200)
-    .attr("y", 160)
-    .attr("text-anchor", "end")
-    .attr("fill", "#fff")
-    .attr("font-size", 40)
-    .text(dNames[weekDay] + " " + month + "/" + day)
+    svg.append("text")
+        .attr("x", 1200)
+        .attr("y", 160)
+        .attr("text-anchor", "end")
+        .attr("fill", "#fff")
+        .attr("font-size", 40)
+        .text(dNames[weekDay] + " " + month + "/" + day)
 
 //currentTemp
-let tempG = svg.append("g")
-    .attr("class", "currTemp")
-    .attr("transform", "translate(180,200)")
-    .attr("stroke", "#fff")
-    .attr("fill", "none")
-
-tempG.append("circle")
-    .attr("r", 90)
-    .attr("stroke-width", 2)
-
-tempG.append("circle")
-    .attr("r", 85)
-    .attr("stroke-width", 10)
-    .attr("stroke", "#ffc107")
-
-tempG.append("circle")
-    .attr("r", 80)
-    .attr("stroke-width", 2)
-tempG.append("circle")
-    .attr("r", 75)
-    .attr("stroke-width", 1)
-    .attr("stroke", "#535353")
-
-tempG.append("text")
-    .attr("y", 50)
-    .attr("text-anchor", "middle")
-    .attr("fill", "#fff")
-    .attr("font-size", 64)
-    .text("13")
-
-tempG.append("text")
-    .attr("y", 68)
-    .attr("text-anchor", "middle")
-    .attr("fill", "#fff")
-    .attr("font-size", 18)
-    .text('\xB0C')
-
-tempG.append("g")
-    .attr("fill", "#fff")
-    .attr("stroke-width", 1)
-    .attr("stroke", "#fff")
-    .attr("transform", "scale(1.5) translate(0,-15)")
-    .html(icon["clear-day"])
-
-//live weather info
-let transX = ["400", "650", "900"]
-let iconTransX = ["500", "812", "1125"]
-let dataAndUnitTransX = [400, 650, 900]
-let unit = ["级", "%", "%"]
-let iconIndex = ["wind", "rain", "humidity2"]
-let weatherData = ["≤3", "30", "70"]
-let infoG = svg.append("g")
-    .attr("class", "live")
-transX.forEach((item, index) => {
-    infoG.append("circle")
-        .attr("r", 30)
-        .attr("stroke-width", 6)
-        .attr("stroke", "#535353")
-        .attr("transform", "translate(" + item + ",200)")
-    infoG.append("circle")
-        .attr("r", 28)
-        .attr("stroke-width", 3)
-        .attr("stroke", "#ffffff")
-        .attr("transform", "translate(" + item + ",200)")
-    infoG.append("g")
-        .attr("fill", "#fff")
-        .attr("stroke-width", 1)
+    let tempG = svg.append("g")
+        .attr("class", "currTemp")
+        .attr("transform", "translate(180,200)")
         .attr("stroke", "#fff")
-        .attr("transform", "scale(0.8) translate(" + iconTransX[index] + ",258)")
-        .html(icon[iconIndex[index]])
-    infoG.append("text")
-        .attr("x", dataAndUnitTransX[index])
-        .attr("y", 280)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#fff")
-        .attr("font-size", 32)
-        .text(weatherData[index])
-    infoG.append("text")
-        .attr("x", dataAndUnitTransX[index])
-        .attr("y", 310)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#fff")
-        .attr("font-size", 16)
-        .text(unit[index])
-})
+        .attr("fill", "none")
 
-//forecast
-let transForecastX = ["320", "485", "650", "815"]
-let transWeekAndWeaIcon = ["400", "565", "730", "895"]
-let transTempIcon = ["315", "480", "645", "810"]
-let transHumIcon = ["410", "575", "740", "905"]
-let transTemp = ["367", "532", "697", "862"]
-let transHum = ["455", "620", "785", "950"]
-let weekDayNum = [6, 7, 1, 2]
-let weekDayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-let weatherDataIcon = ["clear-day", "rain", "snow", "cloudy"]
-let weatherDataTempLow = ["9", "3", "6", "12"]
-let weatherDataTempHigh = ["14", "12", "9", "10"]
-let weatherDataHum = ["70", "75", "65", "42"]
-let forecastG = svg.append("g")
-    .attr("class", "forecast")
-forecastG.append("rect")
-    .attr("width", 660)
-    .attr("height", 165)
-    .attr("style", "stroke-width:1px;stroke:#fff")
-    .attr("transform", "translate(320,450)")
-transForecastX.forEach((item, index) => {
-    forecastG.append("rect")
-        .attr("x", item)
-        .attr("y", 450)
-        .attr("fill", index % 2 ? "#4a4a4a" : "#353535")
-        .attr("width", 165)
-        .attr("height", 165)
-    forecastG.append("text")
-        .attr("x", transWeekAndWeaIcon[index])
-        .attr("y", 470)
+    tempG.append("circle")
+        .attr("r", 90)
+        .attr("stroke-width", 2)
+
+    tempG.append("circle")
+        .attr("r", 85)
+        .attr("stroke-width", 10)
+        .attr("stroke", "#ffc107")
+
+    tempG.append("circle")
+        .attr("r", 80)
+        .attr("stroke-width", 2)
+    tempG.append("circle")
+        .attr("r", 75)
+        .attr("stroke-width", 1)
+        .attr("stroke", "#535353")
+
+    tempG.append("text")
+        .attr("y", 50)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#fff")
+        .attr("font-size", 64)
+        .text(weatherJson.live.temperature)
+
+    tempG.append("text")
+        .attr("y", 68)
         .attr("text-anchor", "middle")
         .attr("fill", "#fff")
         .attr("font-size", 18)
-        .text(weekDayNames[weekDayNum[index]])
-    forecastG.append("g")
-        .attr("class", "icon-weather")
-        .attr("transform", "translate(" + transWeekAndWeaIcon[index] + ",510)" + "scale(1.3)")
-        .attr("fill", "#FcFcFc")
-        .html(icon[weatherDataIcon[index]])
-    forecastG.append("g")
-        .attr("class", "icon-temperature")
-        .attr("transform", "translate(" + transTempIcon[index] + ",560)" + " scale(0.5)")
-        .attr("fill", "#FcFcFc")
-        .html(icon.temperature)
-    forecastG.append("g")
-        .attr("class", "icon-humidity")
-        .attr("transform", "translate(" + transHumIcon[index] + ",578)" + "scale(0.3)")
-        .attr("fill", "#FcFcFc")
-        .html(icon.humidity)
-    forecastG.append("text")
-        .attr("x", transTemp[index])
-        .attr("y", 605)
-        .attr("text-anchor", "middle")
+        .text('\xB0C')
+
+    tempG.append("g")
         .attr("fill", "#fff")
-        .attr("font-size", 17)
-        .text(weatherDataTempLow[index] + '\xB0C')
-    forecastG.append("text")
-        .attr("x", transTemp[index])
-        .attr("y", 575)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#fff")
-        .attr("font-size", 17)
-        .text(weatherDataTempHigh[index] + '\xB0C')
-    forecastG.append("text")
-        .attr("x", transHum[index])
-        .attr("y", 603)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#fff")
-        .attr("font-size", 14)
-        .text(weatherDataHum[index] + '%')
+        .attr("stroke-width", 1)
+        .attr("stroke", "#fff")
+        .attr("transform", "scale(1.5) translate(0,-15)")
+        .html(icon[weatherFlag])
+
+//live weather info
+    let transX = ["400", "650", "900"]
+    let iconTransX = ["500", "812", "1125"]
+    let dataAndUnitTransX = [400, 650, 900]
+    let unit = ["级", "%", "%"]
+    let iconIndex = ["wind", "rain", "humidity2"]
+    let weatherData = [weatherJson.live.windpower, weatherJson.live.rain, weatherJson.live.humidity]
+    let infoG = svg.append("g")
+        .attr("class", "live")
+    transX.forEach((item, index) => {
+        infoG.append("circle")
+            .attr("r", 30)
+            .attr("stroke-width", 6)
+            .attr("stroke", "#535353")
+            .attr("transform", "translate(" + item + ",200)")
+        infoG.append("circle")
+            .attr("r", 28)
+            .attr("stroke-width", 3)
+            .attr("stroke", "#ffffff")
+            .attr("transform", "translate(" + item + ",200)")
+        infoG.append("g")
+            .attr("fill", "#fff")
+            .attr("stroke-width", 1)
+            .attr("stroke", "#fff")
+            .attr("transform", "scale(0.8) translate(" + iconTransX[index] + ",258)")
+            .html(icon[iconIndex[index]])
+        infoG.append("text")
+            .attr("x", dataAndUnitTransX[index])
+            .attr("y", 280)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", 32)
+            .text(weatherData[index])
+        infoG.append("text")
+            .attr("x", dataAndUnitTransX[index])
+            .attr("y", 310)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", 16)
+            .text(unit[index])
+    })
+
+//forecast
+    let transForecastX = ["320", "485", "650", "815"]
+    let transWeekAndWeaIcon = ["400", "565", "730", "895"]
+    let transTempIcon = ["315", "480", "645", "810"]
+    let transHumIcon = ["410", "575", "740", "905"]
+    let transTemp = ["367", "532", "697", "862"]
+    let transHum = ["455", "620", "785", "950"]
+    let weekDayNum = [weatherJson.forecast[0].week, weatherJson.forecast[1].week, weatherJson.forecast[2].week, weatherJson.forecast[3].week]
+    let weekDayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    let weatherDataIcon = [weatherFlag4Forecast[0], weatherFlag4Forecast[1], weatherFlag4Forecast[2], weatherFlag4Forecast[3]]
+    let weatherDataTempLow = [weatherJson.forecast[0].nighttemp, weatherJson.forecast[1].nighttemp, weatherJson.forecast[2].nighttemp, weatherJson.forecast[3].nighttemp]
+    let weatherDataTempHigh = [weatherJson.forecast[0].daytemp, weatherJson.forecast[1].daytemp, weatherJson.forecast[2].daytemp, weatherJson.forecast[3].daytemp]
+    let weatherDataHum = ["70", "75", "65", "42"]
+    let forecastG = svg.append("g")
+        .attr("class", "forecast")
+    forecastG.append("rect")
+        .attr("width", 660)
+        .attr("height", 165)
+        .attr("style", "stroke-width:1px;stroke:#fff")
+        .attr("transform", "translate(320,450)")
+    transForecastX.forEach((item, index) => {
+        forecastG.append("rect")
+            .attr("x", item)
+            .attr("y", 450)
+            .attr("fill", index % 2 ? "#4a4a4a" : "#353535")
+            .attr("width", 165)
+            .attr("height", 165)
+        forecastG.append("text")
+            .attr("x", transWeekAndWeaIcon[index])
+            .attr("y", 470)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", 18)
+            .text(weekDayNames[weekDayNum[index]])
+        forecastG.append("g")
+            .attr("class", "icon-weather")
+            .attr("transform", "translate(" + transWeekAndWeaIcon[index] + ",510)" + "scale(1.3)")
+            .attr("fill", "#FcFcFc")
+            .html(icon[weatherDataIcon[index]])
+        forecastG.append("g")
+            .attr("class", "icon-temperature")
+            .attr("transform", "translate(" + transTempIcon[index] + ",560)" + " scale(0.5)")
+            .attr("fill", "#FcFcFc")
+            .html(icon.temperature)
+        forecastG.append("g")
+            .attr("class", "icon-humidity")
+            .attr("transform", "translate(" + transHumIcon[index] + ",578)" + "scale(0.3)")
+            .attr("fill", "#FcFcFc")
+            .html(icon.humidity)
+        forecastG.append("text")
+            .attr("x", transTemp[index])
+            .attr("y", 605)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", 17)
+            .text(weatherDataTempLow[index] + '\xB0C')
+        forecastG.append("text")
+            .attr("x", transTemp[index])
+            .attr("y", 575)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", 17)
+            .text(weatherDataTempHigh[index] + '\xB0C')
+        forecastG.append("text")
+            .attr("x", transHum[index])
+            .attr("y", 603)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#fff")
+            .attr("font-size", 14)
+            .text(weatherDataHum[index] + '%')
+    })
 })
+
+
+//天气api部分
+// getWeather(3301)
+
+async function getWeather(location) {
+    let formData = new FormData();
+    formData.append("location", location)
+    formData.append("getLive", "true")
+    formData.append("getForecast", "true");
+    let options = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+    };
+    const weather = await fetch('http://111.0.80.7:7654/weather-server-go/rest/weather/getWeather', options).then(res => res.json())
+    // console.log(weather.data)
+    return weather.data
+}
