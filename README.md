@@ -5,6 +5,7 @@
 * [Demo](#Demo)
 * [Screenshots](#screenshots)
 * [Setup](#setup)
+* [Restful API](#Restful API)
 * [Inspiration](#inspiration)
 * [Contact](#contact)
 
@@ -35,7 +36,12 @@ This will install `http-server` globally so that it may be run from the command 
     cd [project path]
     http-server -c-l
 
+## Restful API
+
+https://github.com/myleo1/weather-server-go
+
 ## Inspiration
+
 https://observablehq.com/@alanyu1216/weather-panel
 
 ## Contact
